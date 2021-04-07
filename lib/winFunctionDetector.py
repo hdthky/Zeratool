@@ -2,7 +2,7 @@ from __future__ import print_function
 import r2pipe
 import json
 
-def getWinFunctions(binary_name):
+def getWinFunctions(binary_name, properties):
 
     winFunctions = {}
 
@@ -40,7 +40,9 @@ def getWinFunctions(binary_name):
                     winFunctions[ref['fcn_name']] = ref
 
     for k,v in winFunctions.items():
-        print("[+] Found win function {}".format(k))
+        if properties['protections']['pie']:
+            v["fcn_addr"] += 0x56555000
+        print("[+] Found win function {} at {}".format(k, hex(v["fcn_addr"])))
 
     return winFunctions
 

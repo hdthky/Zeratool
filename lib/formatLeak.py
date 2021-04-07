@@ -2,6 +2,7 @@ from __future__ import print_function
 from pwn import *
 import binascii
 import string
+import re
 
 def checkLeak(binary_name,properties,remote_server=False,remote_url="",port_num=1337):
 
@@ -98,11 +99,14 @@ def checkLeak(binary_name,properties,remote_server=False,remote_url="",port_num=
         full_string = ''.join([x if x in string.printable else '' for x in full_string])
 
     leakProperties = {}
+    leakProperties['flag'] = None
     leakProperties['flag_found'] = False
 
     #Dumb check for finding flag
-    if '{' in full_string and '}' in full_string:
+    re_result = re.search("flag{.*?}", full_string)
+    if re_result != None:
         print("[+] Flag found:")
+        leakProperties['flag'] = re_result.group(0)
         leakProperties['flag_found'] = True
 
 

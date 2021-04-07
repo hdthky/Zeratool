@@ -28,21 +28,22 @@ def main():
     if args.verbose:
         logging.disable(logging.CRITICAL)
 
-    #Detect problem type
     properties = {}
+
+    #Get problem mitigations 
+    print("[+] Getting binary protections")
+    properties['protections'] = protectionDetector.getProperties(args.file)
+
+    #Detect problem type
     properties['input_type'] = inputDetector.checkInputType(args.file)
     properties['libc'] = args.libc
     properties['file'] = args.file
     print("[+] Checking pwn type...")
     print("[+] Checking for overflow pwn type...")
-    properties['pwn_type'] = overflowDetector.checkOverflow(args.file,inputType=properties['input_type'])
+    properties['pwn_type'] = overflowDetector.checkOverflow(args.file,properties,inputType=properties['input_type'])
     if properties['pwn_type']['type'] is None:
         print("[+] Checking for format string pwn type...")
-        properties['pwn_type'] = formatDetector.checkFormat(args.file,inputType=properties['input_type'])
-
-    #Get problem mitigations 
-    print("[+] Getting binary protections")
-    properties['protections'] = protectionDetector.getProperties(args.file)
+        properties['pwn_type'] = formatDetector.checkFormat(args.file,properties,inputType=properties['input_type'])
 
     #Is it a leak based one?
     if properties['pwn_type']['type'] == "Format":
@@ -58,7 +59,7 @@ def main():
 
 
     #Is there an easy win function
-    properties['win_functions'] = winFunctionDetector.getWinFunctions(args.file)
+    properties['win_functions'] = winFunctionDetector.getWinFunctions(args.file, properties)
 
     #Exploit overflows
     if properties['pwn_type']['type'] == "Overflow":

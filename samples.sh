@@ -20,3 +20,6 @@ python zeratool.py challenges/hard_format
 
 #Buffer overflow point to shellcode
 python zeratool.py challenges/demo_bin
+
+#PIE and buffer overflow with win function
+python zeratool.py challenges/bof4

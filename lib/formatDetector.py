@@ -116,9 +116,12 @@ class printFormat(angr.procedures.libc.printf.printf):
         if not self.checkExploitable():
             return super(type(self), self).run()
 
-def checkFormat(binary_name,inputType="STDIN"):
+def checkFormat(binary_name,properties,inputType="STDIN"):
 
-    p = angr.Project(binary_name,load_options={"auto_load_libs": False})
+    if properties['protections']['pie']:
+        p = angr.Project(binary_name,load_options={"auto_load_libs": False},main_opts={"base_addr": 0x56555000})
+    else:
+        p = angr.Project(binary_name,load_options={"auto_load_libs": False})
 
     p.hook_symbol('printf',printFormat)
 

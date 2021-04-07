@@ -5,14 +5,17 @@ import time
 import timeout_decorator
 import IPython
 
-def checkOverflow(binary_name,inputType="STDIN"):
+def checkOverflow(binary_name, properties, inputType="STDIN"):
 
     class hookFour(angr.SimProcedure):
         IS_FUNCTION = True
         def run(self):
             return 4 # Fair dice roll
 
-    p = angr.Project(binary_name,load_options={"auto_load_libs": False})
+    if properties['protections']['pie']:
+        p = angr.Project(binary_name,load_options={"auto_load_libs": False},main_opts={"base_addr": 0x56555000})
+    else:
+        p = angr.Project(binary_name,load_options={"auto_load_libs": False})
     #Hook rands
     p.hook_symbol('rand',hookFour)
     p.hook_symbol('srand',hookFour)
@@ -166,5 +169,5 @@ def hook_functions(p):
                 if simfd is None:
                     return -1
                 return simfd.read(dst, 2**10)
-                
+
         p.hook_symbol("gets", gets())
